@@ -27,12 +27,10 @@ jobs:
           test -n "$SDKMANAGER"
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
-      - name: Configurar Gradle
-        uses: gradle/actions/setup-gradle@v4
       - name: Compilar APK Debug
         run: |
-          chmod +x gradlew
-          ./gradlew --no-daemon assembleDebug
+          gradle --version
+          gradle --no-daemon assembleDebug
       - name: Preparar APK para descarga directa
         run: cp app/build/outputs/apk/debug/app-debug.apk SKC-Facturas.apk
       - name: Guardar APK como artifact
