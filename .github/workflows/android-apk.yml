@@ -1,0 +1,48 @@
+name: Compilar y publicar APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Preparar Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Instalar SDK 36
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Compilar APK Debug
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+      - name: Preparar APK para descarga directa
+        run: cp app/build/outputs/apk/debug/app-debug.apk SKC-Facturas.apk
+      - name: Guardar APK como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SKC-Facturas-APK
+          path: SKC-Facturas.apk
+      - name: Publicar APK en GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: SKC Facturas APK - build ${{ github.run_number }}
+          body: APK de depuración instalable compilado automáticamente desde main. Para producción se necesita una firma release propia.
+          files: SKC-Facturas.apk
+          make_latest: true
+          generate_release_notes: false
