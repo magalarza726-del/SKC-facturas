@@ -131,6 +131,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         withContext(Dispatchers.IO) { repo.saveAppConfig(config); runCatching { repo.syncNow() } }
         notice = "Configuración actualizada para todos"
     }
+    fun saveTransferConfirmationMode(required: Boolean) = run {
+        withContext(Dispatchers.IO) { repo.saveTransferConfirmationMode(required); runCatching { repo.syncNow() } }
+        notice = if (required) "Se requiere confirmación del receptor" else "Transferencias directas habilitadas"
+    }
     fun saveExcelOptions(includeInternalTransfersInExcel: Boolean) = run {
         withContext(Dispatchers.IO) { repo.saveExcelOptions(includeInternalTransfersInExcel); runCatching { repo.syncNow() } }
         notice = "Excel actualizado"

@@ -38,11 +38,16 @@ jobs:
         with:
           name: SKC-Facturas-APK
           path: SKC-Facturas.apk
+      - name: Obtener versión Android
+        run: |
+          VERSION=$(sed -nE 's/^[[:space:]]*versionName[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' app/build.gradle.kts | head -n 1)
+          test -n "$VERSION"
+          echo "APP_VERSION=$VERSION" >> "$GITHUB_ENV"
       - name: Publicar APK en GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: apk-${{ github.run_number }}
-          name: SKC Facturas APK - build ${{ github.run_number }}
+          tag_name: v${{ env.APP_VERSION }}-build-${{ github.run_number }}
+          name: SKC Facturas v${{ env.APP_VERSION }} - build ${{ github.run_number }}
           body: APK de depuración instalable compilado automáticamente desde main. Para producción se necesita una firma release propia.
           files: SKC-Facturas.apk
           make_latest: true

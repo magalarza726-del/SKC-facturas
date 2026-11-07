@@ -631,7 +631,7 @@ private fun InvoiceScreen(vm: AppViewModel) {
     val s = vm.snapshot
     val cfg = s.config
     val fields = cfg.fields("invoice").filter { it.visible }.sortedBy { it.order }
-    val hasEvidenceField = fields.any { it.fieldType == FIELD_EVIDENCE || it.key == "attachments" }
+    val evidenceRequired = fields.any { (it.fieldType == FIELD_EVIDENCE || it.key == "attachments") && it.required }
     val current = s.currentUser()
     val editing = vm.editingInvoice()
     val editKey = editing?.id ?: "new"
@@ -653,7 +653,7 @@ private fun InvoiceScreen(vm: AppViewModel) {
             put("description", editing?.description ?: vm.invoicePrefill.ifBlank { configuredDefault(s, "invoice", "description") })
             put("area", editing?.area ?: configuredDefault(s, "invoice", "area"))
             put("liquidationType", editing?.liquidationType ?: configuredDefault(s, "invoice", "liquidationType"))
-            put("evidenceStatus", editing?.evidenceStatus ?: configuredDefault(s, "invoice", "evidenceStatus").ifBlank { if (hasEvidenceField) "Comprobante adjunto" else "Compra sin comprobante" })
+            put("evidenceStatus", editing?.evidenceStatus ?: configuredDefault(s, "invoice", "evidenceStatus").ifBlank { if (evidenceRequired) "Comprobante adjunto" else "Compra sin comprobante" })
             put("supplier", editing?.supplier ?: configuredDefault(s, "invoice", "supplier"))
             put("supplierRuc", editing?.supplierRuc.orEmpty())
             put("supplierEmail", editing?.supplierEmail.orEmpty())
@@ -741,7 +741,10 @@ private fun InvoiceScreen(vm: AppViewModel) {
         accountUserId = resolvedValues["accountUserId"].orEmpty().ifBlank { current?.id.orEmpty() },
         amount = resolvedValues["amount"].orEmpty().toDoubleOrNull() ?: 0.0,
         purchaseDate = resolvedValues["purchaseDate"].orEmpty().ifBlank { TimeUtils.todayIso() },
-        evidenceStatus = resolvedValues["evidenceStatus"].orEmpty().ifBlank { if ((editing?.attachments?.isNotEmpty() == true) || uris.isNotEmpty()) "Comprobante adjunto" else "Compra sin comprobante" },
+        evidenceStatus = resolvedValues["evidenceStatus"].orEmpty().ifBlank {
+            if ((editing?.attachments?.isNotEmpty() == true) || uris.isNotEmpty()) "Comprobante adjunto"
+            else "Compra sin comprobante"
+        },
         supplier = catalogSupplier?.name ?: supplierText,
         supplierRuc = resolvedValues["supplierRuc"].orEmpty().ifBlank { catalogSupplier?.ruc.orEmpty() },
         supplierEmail = resolvedValues["supplierEmail"].orEmpty().ifBlank { catalogSupplier?.email.orEmpty() },
@@ -1738,7 +1741,7 @@ private fun SettingsScreen(vm: AppViewModel) {
         return
     }
 
-    val tabs = listOf("Cuenta", "Usuarios", "Formatos personalizados", "Nube y respaldo")
+    val tabs = listOf("Cuenta", "Usuarios", "Transferencias", "Formatos personalizados", "Nube y respaldo")
     var tab by remember { mutableStateOf("Cuenta") }
 
     MobilePage("Configuración") {
@@ -1746,12 +1749,32 @@ private fun SettingsScreen(vm: AppViewModel) {
         when (tab) {
             "Cuenta" -> AccountSettings(vm)
             "Usuarios" -> UsersSettings(vm)
+            "Transferencias" -> TransferSettings(vm)
             "Formatos personalizados" -> CustomFormatsSettings(vm)
             "Nube y respaldo" -> CloudAndBackupSettings(vm)
         }
     }
 }
 
+
+@Composable
+private fun TransferSettings(vm: AppViewModel) {
+    val required = vm.snapshot.config.transferRequiresConfirmation
+    MobileCard {
+        Text("Confirmación de transferencias", style = MaterialTheme.typography.titleLarge)
+        SwitchLine("Requerir confirmación del receptor", required) { enabled ->
+            vm.saveTransferConfirmationMode(enabled)
+        }
+        Text(
+            if (required) "Emisor y receptor: el dinero se acredita cuando el receptor confirma. Puede rechazarlo."
+            else "Solo emisor: al enviar, la transferencia se confirma y acredita automáticamente al receptor.",
+            fontSize = 11.sp,
+            color = SkcPalette.Muted
+        )
+        Text("El cambio aplica a las transferencias nuevas. Las pendientes mantienen su proceso original.",
+            fontSize = 10.sp, color = SkcPalette.Muted)
+    }
+}
 
 @Composable
 private fun InitialSupabaseSettings(vm: AppViewModel, firstRun: Boolean) {

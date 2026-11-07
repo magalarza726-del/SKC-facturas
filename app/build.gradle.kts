@@ -11,8 +11,8 @@ android {
         applicationId = "com.skcingenieria.facturas"
         minSdk = 26
         targetSdk = 36
-        versionCode = 31504
-        versionName = "3.15.4"
+        versionCode = 31505
+        versionName = "3.15.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

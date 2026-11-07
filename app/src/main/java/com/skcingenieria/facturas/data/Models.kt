@@ -693,6 +693,7 @@ data class AppConfig(
     val forms: Map<String, List<FormFieldConfig>> = defaultFormLayouts(),
     val excelTemplate: ExcelTemplateConfig = ExcelTemplateConfig(),
     val includeInternalTransfersInExcel: Boolean = false,
+    val transferRequiresConfirmation: Boolean = true,
     val storage: StorageConfig = StorageConfig(),
     val revocationKey: String = "",
     val formsUpdatedAt: String = "",
@@ -726,6 +727,7 @@ data class AppConfig(
         })
         put("excelTemplate", excelTemplate.toJson())
         put("includeInternalTransfersInExcel", includeInternalTransfersInExcel)
+        put("transferRequiresConfirmation", transferRequiresConfirmation)
         put("storage", storage.toJson())
         put("revocationKey", revocationKey)
         put("formsUpdatedAt", formsUpdatedAt)
@@ -763,6 +765,7 @@ data class AppConfig(
                 forms = parsed,
                 excelTemplate = ExcelTemplateConfig.fromJson(j.optJSONObject("excelTemplate")),
                 includeInternalTransfersInExcel = j.b("includeInternalTransfersInExcel"),
+                transferRequiresConfirmation = j.b("transferRequiresConfirmation", true),
                 storage = StorageConfig.fromJson(j.optJSONObject("storage")),
                 revocationKey = j.s("revocationKey"),
                 formsUpdatedAt = j.s("formsUpdatedAt"),

@@ -46,7 +46,7 @@ data class InvoiceDraft(
     val accountUserId: String = "",
     val amount: Double = 0.0,
     val purchaseDate: String = TimeUtils.todayIso(),
-    val evidenceStatus: String = "Comprobante adjunto",
+    val evidenceStatus: String = "Compra sin comprobante",
     val supplier: String = "",
     val supplierRuc: String = "",
     val supplierEmail: String = "",
@@ -1324,6 +1324,11 @@ class AppRepository(private val context: Context) {
         audit("CONFIGURACION", "global", "GUARDAR", "Configuración actualizada")
     }
 
+    /** Changes transfer confirmation mode without overwriting unrelated remote configuration. */
+    fun saveTransferConfirmationMode(required: Boolean) {
+        saveAppConfig(latestAppConfig().copy(transferRequiresConfirmation = required))
+    }
+
     /** Updates only the Excel flag against the newest locally stored configuration. */
     fun saveExcelOptions(includeInternalTransfersInExcel: Boolean) {
         val current = latestAppConfig()
@@ -1463,7 +1468,8 @@ class AppRepository(private val context: Context) {
         if (snap.config.fields("invoice").any { it.visible && it.required && (it.key == "attachments" || it.fieldType == FIELD_EVIDENCE) }) {
             require(attachments.isNotEmpty()) { "Evidencias es obligatorio" }
         }
-        InvoiceRules.evidenceError(normalizedDraft.evidenceStatus, attachments.size)?.let { error(it) }
+        // La evidencia solo es obligatoria si el administrador marcó el campo como requerido.
+        // El estado seleccionado no debe imponer una segunda obligatoriedad oculta.
         val hash = FileUtils.combinedHash(attachments)
         val matches = duplicateMatches(normalizedDraft, hash)
         val noProof = normalizedDraft.evidenceStatus.contains("sin comprobante", true)
@@ -1597,7 +1603,7 @@ class AppRepository(private val context: Context) {
             if (snap.config.fields("invoice").any { it.visible && it.required && (it.key == "attachments" || it.fieldType == FIELD_EVIDENCE) }) {
                 require(attachments.isNotEmpty()) { "Evidencias es obligatorio" }
             }
-            InvoiceRules.evidenceError(normalizedDraft.evidenceStatus, attachments.size)?.let { error(it) }
+            // Respetar el ajuste de evidencia opcional también al editar facturas.
             val hash = FileUtils.combinedHash(attachments)
             val duplicates = duplicateMatches(normalizedDraft, hash, current.id)
             val now = TimeUtils.nowIso()
@@ -2036,6 +2042,10 @@ class AppRepository(private val context: Context) {
         if (snap.config.fields(module).any { it.visible && it.required && (it.key == "attachments" || it.fieldType == FIELD_EVIDENCE) }) {
             require(attachments.isNotEmpty()) { "Adjuntar evidencia es obligatorio" }
         }
+        // En modo directo el emisor acredita inmediatamente al receptor.
+        // La confirmación manual sigue aplicando a transferencias anteriores pendientes.
+        val automaticTransfer = type == "TRANSFERENCIA" && !snap.config.transferRequiresConfirmation
+        val ledgerId = if (automaticTransfer) "transferencia-$id" else ""
         val message = Message(
             id = id,
             code = code,
@@ -2047,7 +2057,14 @@ class AppRepository(private val context: Context) {
             amount = amount,
             project = project.trim(),
             reason = reason.trim(),
-            status = if (type == "SOLICITUD_MONTO") "PENDIENTE" else "ENVIADO",
+            status = when {
+                type == "SOLICITUD_MONTO" -> "PENDIENTE"
+                automaticTransfer -> "CONFIRMADO"
+                else -> "ENVIADO"
+            },
+            confirmedByUserId = if (automaticTransfer) from.id else "",
+            confirmedAt = if (automaticTransfer) now else "",
+            ledgerEntryId = ledgerId,
             attachments = attachments,
             createdAt = now,
             updatedAt = now,
@@ -2059,8 +2076,40 @@ class AppRepository(private val context: Context) {
             sourceRequestId = sourceRequestId,
             extraFields = extraFields
         )
-        db.put(TYPE_MESSAGES, id, message.toJson(), SYNC_PENDING, now)
-        audit("MENSAJE", id, if (type == "TRANSFERENCIA") "ENVIAR_TRANSFERENCIA" else "SOLICITAR_MONTO", code)
+        db.transaction {
+            db.put(TYPE_MESSAGES, id, message.toJson(), SYNC_PENDING, now)
+            if (automaticTransfer) {
+                val beneficiary = requireNotNull(to)
+                val ledger = LedgerEntry(
+                    id = ledgerId,
+                    sourceType = "TRANSFERENCIA",
+                    sourceId = id,
+                    sourceCode = code,
+                    userId = beneficiary.id,
+                    username = beneficiary.name,
+                    direction = "INGRESO",
+                    amount = amount,
+                    occurredAt = message.transferDate,
+                    createdAt = now,
+                    updatedAt = now,
+                    createdByUserId = from.id,
+                    createdBy = from.name,
+                    reason = reason.trim().ifBlank { "Transferencia directa" }
+                )
+                db.put(TYPE_LEDGER, ledgerId, ledger.toJson(), SYNC_PENDING, now)
+                if (sourceRequestId.isNotBlank()) {
+                    db.get(TYPE_MESSAGES, sourceRequestId)?.payload?.let(Message::fromJson)?.let { request ->
+                        db.put(TYPE_MESSAGES, request.id, request.copy(
+                            status = "COMPLETADA", updatedAt = now, syncStatus = SYNC_PENDING
+                        ).toJson(), SYNC_PENDING, now)
+                    }
+                }
+            }
+        }
+        audit("MENSAJE", id,
+            if (automaticTransfer) "TRANSFERENCIA_DIRECTA" else if (type == "TRANSFERENCIA") "ENVIAR_TRANSFERENCIA" else "SOLICITAR_MONTO",
+            code
+        )
         return message
     }
 
@@ -2154,7 +2203,7 @@ class AppRepository(private val context: Context) {
         )
         val now = TimeUtils.nowIso()
         val updated = request.copy(
-            status = "RESPONDIDA",
+            status = if (transfer.status == "CONFIRMADO") "COMPLETADA" else "RESPONDIDA",
             responseTransferId = transfer.id,
             respondedByUserId = actor.id,
             respondedAt = now,

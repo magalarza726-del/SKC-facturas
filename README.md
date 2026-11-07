@@ -123,3 +123,13 @@ Cada actualización a `main` activa GitHub Actions. Si la compilación termina c
 **Enlace directo (funciona cuando existe una release exitosa):** https://github.com/magalarza726-del/SKC-facturas/releases/latest/download/SKC-Facturas.apk
 
 Este APK es `debug`, lleva el sufijo de aplicación `.pilot` y está pensado para pruebas. No es una versión release firmada para distribución.
+
+
+## Portal de descargas
+
+El portal de una sola sección está en [docs/index.html](docs/index.html).
+Para habilitarlo por primera vez: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+- **Portal:** https://magalarza726-del.github.io/SKC-facturas/
+- **APK directa:** https://github.com/magalarza726-del/SKC-facturas/releases/latest/download/SKC-Facturas.apk
+- **Cambios 3.15.5:** [CHANGELOG_3.15.5.md](CHANGELOG_3.15.5.md).
