@@ -1839,6 +1839,7 @@ private fun AccountSettings(vm: AppViewModel) {
                 OutlinedButton(onClick = vm::signOut, modifier = Modifier.fillMaxWidth()) { Text("Cerrar sesión") }
             }
         }
+        Text("Versión v$APP_VERSION", color = SkcPalette.Muted, fontSize = 11.sp)
     }
 }
 

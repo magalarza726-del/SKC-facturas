@@ -11,8 +11,8 @@ android {
         applicationId = "com.skcingenieria.facturas"
         minSdk = 26
         targetSdk = 36
-        versionCode = 31505
-        versionName = "3.15.5"
+        versionCode = 31506
+        versionName = "1.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,7 +37,6 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".pilot"
-            versionNameSuffix = "-debug"
         }
         release {
             isMinifyEnabled = false

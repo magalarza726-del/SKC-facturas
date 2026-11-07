@@ -1016,7 +1016,7 @@ class AppRepository(private val context: Context) {
             putText(zip, "manifest.json", JSONObject().apply {
                 put("format", "skc-invoice-backup")
                 put("schemaVersion", 1)
-                put("appVersion", "3.15.4")
+                put("appVersion", APP_VERSION)
                 put("createdAt", TimeUtils.nowIso())
                 put("invoiceId", transaction.id)
                 put("invoiceCode", transaction.code)
@@ -2971,7 +2971,7 @@ class AppRepository(private val context: Context) {
         return JSONObject().apply {
             put("format", "skc-catalogs")
             put("schemaVersion", DATA_SCHEMA_VERSION)
-            put("appVersion", "3.15.4")
+            put("appVersion", APP_VERSION)
             put("createdAt", TimeUtils.nowIso())
             put("catalogs", snap.catalogs.toJson())
         }.toString(2)
@@ -3012,7 +3012,7 @@ class AppRepository(private val context: Context) {
         return JSONObject().apply {
             put("format", "skc-app-settings")
             put("schemaVersion", 5)
-            put("appVersion", "3.15.4")
+            put("appVersion", APP_VERSION)
             put("createdAt", TimeUtils.nowIso())
 
             // Copias completas para que cualquier campo de configuración actual sea portable.
@@ -3216,7 +3216,7 @@ class AppRepository(private val context: Context) {
     fun exportBackup(): String {
         val root = JSONObject().apply {
             put("format", "skc-facturas-android-backup")
-            put("version", "3.15.4")
+            put("version", APP_VERSION)
             put("createdAt", TimeUtils.nowIso())
             put("settings", state.settings().copy(externalBackup = ExternalBackupConfig()).toJson())
             put("entities", JSONArray().also { array ->
@@ -3347,7 +3347,7 @@ class AppRepository(private val context: Context) {
             val manifest = JSONObject().apply {
                 put("format", "skc-portable-export")
                 put("schemaVersion", 1)
-                put("appVersion", "3.15.4")
+                put("appVersion", APP_VERSION)
                 put("createdAt", TimeUtils.nowIso())
                 put("includesFiles", includeFiles)
                 put("entityCount", rows.size)

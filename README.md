@@ -1,4 +1,4 @@
-# SKC Facturas Android Nativo 3.15.4
+# SKC Facturas Android Nativo 1.5.1
 
 Aplicación Android Kotlin/Compose para facturas, transferencias, historial, recordatorios, sincronización y respaldos de SKC Ingeniería.
 
@@ -107,6 +107,8 @@ APK esperado:
 
 ## Documentación de esta versión
 
+- `CHANGELOG_1.5.1.md` (versión vigente; contador comercial reiniciado)
+
 - `CHANGELOG_3.15.4.md`
 - `VERIFICACION_3.15.4.md`
 - `CHANGELOG_3.15.2.md`
@@ -127,9 +129,9 @@ Este APK es `debug`, lleva el sufijo de aplicación `.pilot` y está pensado par
 
 ## Portal de descargas
 
-El portal de una sola sección está en [docs/index.html](docs/index.html).
-Para habilitarlo por primera vez: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+El portal de una sola sección se publica desde [index.html](index.html) (con copia en [docs/index.html](docs/index.html)). El botón descarga la última versión publicada en Releases.
 
 - **Portal:** https://magalarza726-del.github.io/SKC-facturas/
 - **APK directa:** https://github.com/magalarza726-del/SKC-facturas/releases/latest/download/SKC-Facturas.apk
-- **Cambios 3.15.5:** [CHANGELOG_3.15.5.md](CHANGELOG_3.15.5.md).
+- **Versión actual: v1.5.1.** [Cambios de la versión](CHANGELOG_1.5.1.md).
+- Historial anterior: [v3.15.5](CHANGELOG_3.15.5.md).

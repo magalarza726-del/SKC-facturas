@@ -30,6 +30,8 @@ const val STORAGE_AVAILABLE = "available"
 const val STORAGE_FAILED = "failed"
 const val STORAGE_UNAVAILABLE = "unavailable"
 const val STORAGE_DELETING = "deleting"
+/** Número de versión comercial visible; no alterar al reiniciar el contador los esquemas de datos. */
+const val APP_VERSION = "1.5.1"
 const val DATA_SCHEMA_VERSION = 351
 const val FORM_SCHEMA_VERSION = 610
 const val FIELD_EVIDENCE = "EVIDENCE"
