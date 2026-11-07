@@ -13,15 +13,12 @@
     main { max-width: 1220px; min-height: 540px; margin: auto; padding: 96px 45px; display: flex; gap: 65px; justify-content: space-between; align-items: center; }
     .info { flex: 1 1 650px; }
     h1 { margin: 0 0 13px; font-size: clamp(38px,5.8vw,68px); letter-spacing: -2.2px; line-height: 1.1; font-weight: 750; }
-    .subtitle { margin: 0 0 45px; font-size: clamp(17px,2.2vw,28px); line-height: 1.38; color: #4e5667; }
     .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
     .button { display: inline-flex; gap: 12px; align-items: center; justify-content: center; padding: 17px 23px; border-radius: 10px; font-size: 17px; font-weight: 650; text-decoration: none; line-height: 1.2; transition: transform .15s, box-shadow .15s; }
     .button:hover { transform: translateY(-2px); }
     .button:focus-visible { outline: 3px solid #6aa4ff; outline-offset: 3px; }
     .primary { background: #0c4bd7; border: 1px solid #0c4bd7; color: white; box-shadow: 0 5px 14px rgb(10 75 210 / 10%); }
     .primary:hover { background: #073eb9; box-shadow: 0 9px 18px rgb(10 75 210 / 17%); }
-    .secondary { background: #fff; color: #111827; border: 1px solid #a5badc; }
-    .secondary:hover { background: #f1f6ff; }
     .button svg { width: 23px; height: 23px; flex-shrink: 0; }
     .meta { margin-top: 24px; font-size: 15px; line-height: 1.9; color: #536071; }
     .meta p { margin: 0; }
@@ -36,15 +33,10 @@
 <main>
   <section class="info" aria-labelledby="title">
     <h1 id="title">SKC Facturas</h1>
-    <p class="subtitle">Control de facturas, transferencias e inventario.</p>
     <div class="actions">
       <a class="button primary" id="apk" href="https://github.com/magalarza726-del/SKC-facturas/releases/latest/download/SKC-Facturas.apk" aria-label="Descargar la última APK de SKC Facturas">
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M17.52 10.08l1.23-2.13-.86-.5-1.25 2.16a8.1 8.1 0 0 0-9.28 0L6.11 7.45l-.86.5 1.23 2.13A7.86 7.86 0 0 0 3 16.5V18h2v4h2v-4h10v4h2v-4h2v-1.5a7.86 7.86 0 0 0-3.48-6.42ZM8 14a.85.85 0 1 1 0-1.7A.85.85 0 0 1 8 14Zm8 0a.85.85 0 1 1 0-1.7A.85.85 0 0 1 16 14Z"/></svg>
         <span id="download-label">Descargar APK (v1.5.1)</span>
-      </a>
-      <a class="button secondary" href="https://github.com/magalarza726-del/SKC-facturas" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.76-.24.76-.53v-2.05c-3.1.67-3.75-1.32-3.75-1.32-.51-1.29-1.25-1.63-1.25-1.63-1.02-.7.07-.69.07-.69 1.12.08 1.72 1.16 1.72 1.16.99 1.7 2.6 1.21 3.23.93.1-.72.39-1.21.7-1.49-2.48-.28-5.08-1.24-5.08-5.53 0-1.22.44-2.22 1.16-3.01-.12-.29-.5-1.43.11-2.97 0 0 .95-.3 3.08 1.15a10.8 10.8 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.62 1.54.24 2.68.12 2.97.72.79 1.16 1.79 1.16 3.01 0 4.3-2.6 5.24-5.09 5.52.4.35.75 1.03.75 2.08v3.13c0 .29.2.64.77.53A11.2 11.2 0 0 0 12 .8Z"/></svg>
-        <span>Ver en GitHub</span>
       </a>
     </div>
     <div class="meta" aria-live="polite">
