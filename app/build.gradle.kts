@@ -3,7 +3,23 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+// Se reutiliza la firma original de Android Studio para que Android acepte las
+// actualizaciones sin desinstalar ni borrar los datos de la instalación anterior.
+// Nunca insertar un archivo .keystore ni contraseñas en el repositorio público.
+val originalSigningKeystorePath = System.getenv("SKC_SIGNING_KEYSTORE_PATH")?.takeIf { it.isNotBlank() }
+
 android {
+    signingConfigs {
+        if (originalSigningKeystorePath != null) {
+            create("original") {
+                storeFile = file(originalSigningKeystorePath)
+                storePassword = System.getenv("SKC_SIGNING_STORE_PASSWORD")?.takeIf { it.isNotBlank() } ?: "android"
+                keyAlias = System.getenv("SKC_SIGNING_KEY_ALIAS")?.takeIf { it.isNotBlank() } ?: "androiddebugkey"
+                keyPassword = System.getenv("SKC_SIGNING_KEY_PASSWORD")?.takeIf { it.isNotBlank() } ?: "android"
+            }
+        }
+    }
+
     namespace = "com.skcingenieria.facturas"
     compileSdk = 36
 
@@ -11,7 +27,7 @@ android {
         applicationId = "com.skcingenieria.facturas"
         minSdk = 26
         targetSdk = 36
-        versionCode = 31506
+        versionCode = 31507
         versionName = "1.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -37,6 +53,9 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".pilot"
+            if (originalSigningKeystorePath != null) {
+                signingConfig = signingConfigs.getByName("original")
+            }
         }
         release {
             isMinifyEnabled = false

@@ -118,6 +118,14 @@ APK esperado:
 - `ARQUITECTURA_3.13.0.md` (base de arquitectura vigente)
 
 
+## Compatibilidad con instalaciones anteriores
+
+**Las APK anteriores de GitHub se compilaban con firmas temporales y podrían
+provocar el error "Conflicto con el paquete".**
+El flujo actual requiere la firma original antes de publicar nuevos APK.
+Consulta [COMPATIBILIDAD_APK.md](COMPATIBILIDAD_APK.md) para preparar
+una actualización que preserve los datos sin desinstalar.
+
 ## APK automático en GitHub
 
 Cada actualización a `main` activa GitHub Actions. Si la compilación termina correctamente, el APK se publica en GitHub Releases.
